@@ -13,7 +13,7 @@ function reset() {
 }
 function createPost(title) {
   const id = uuidv4();
-  const post = { id, title, createdAt: Date.now() };
+  const post = { id, title, createdAt:new Date().toISOString()};
   db.posts.set(id, post);
   db.commentsByPost.set(id, new Map());
   db.headComment.set(id, new Set());
@@ -29,6 +29,7 @@ function listPosts() {
 function addComment(postId, { user, content, head_comment_id }) {
   const comments = db.commentsByPost.get(postId);
   if (!comments) return { error: "POST_NOT_FOUND" };
+  const id = uuidv4();
   let length = 1;
   if (head_comment_id) {
     const head = comments.get(head_comment_id);
@@ -81,7 +82,7 @@ function buildTreeForPost(postId, collapseThreshold) {
 
   function buildNode(id) {
     const comment = comments.get(id);
-    const childIds = getChildren(postId, id);
+    const childIds = getChildComment(postId, id);
     const node = {
       id: comment.id,
       user: comment.user,

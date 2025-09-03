@@ -1,7 +1,7 @@
 const store = require("../store/memoryStore");
 const {ensurePost} = require("./post.service");
 
-function addComment(postId, { user, content, parent_comment_id = null }) {
+function addComment(postId, { user, content, head_comment_id = null }) {
   ensurePost(postId);
   if (!user || !content) {
     const err = new Error("user and content are required");
@@ -9,7 +9,7 @@ function addComment(postId, { user, content, parent_comment_id = null }) {
     err.code = "VALIDATION_ERROR";
     throw err;
   }
-  const result = store.addComment(postId, { user, content, parent_comment_id });
+  const result = store.addComment(postId, { user, content, head_comment_id });
   if (result.error) {
     const err = new Error(result.error);
     if (result.error === "PARENT_NOT_FOUND") {
