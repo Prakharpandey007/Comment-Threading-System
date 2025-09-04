@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const db = {
   posts: new Map(),
   commentsByPost: new Map(),
-  headComment: new Map(), //rootsByPost
+  headComment: new Map(),
   subComments: new Map(),
 };
 function reset() {
@@ -30,12 +30,12 @@ function addComment(postId, { user, content, head_comment_id }) {
   const comments = db.commentsByPost.get(postId);
   if (!comments) return { error: "POST_NOT_FOUND" };
   const id = uuidv4();
-  let length = 1;
+  let depth = 1;
   if (head_comment_id) {
     const head = comments.get(head_comment_id);
     if (!head) return { error: "head_NOT_FOUND" };
-    length = head.length + 1;
-    if (length > 5) return { error: "MAX_length_EXCEEDED" };
+    depth = head.depth + 1;
+    if (depth > 5) return { error: "MAX_depth_EXCEEDED" };
   }
   const comment = {
     id,
@@ -45,7 +45,7 @@ function addComment(postId, { user, content, head_comment_id }) {
     content: String(content),
     head_comment_id: head_comment_id || null,
     votes: 0,
-    length,
+    depth,
   };
   comments.set(id, comment);
   // for the comment on the comment
@@ -93,19 +93,19 @@ function buildTreeForPost(postId, collapseThreshold) {
       depth: comment.depth,
       replies: [],
     };
-    if (childIds.length === 0) return node;
+    if (childIds.depth === 0) return node;
     let idsToShow = childIds;
     let meta = null;
     if (
       Number.isInteger(collapseThreshold) &&
       collapseThreshold >= 0 &&
-      childIds.length > collapseThreshold
+      childIds.depth > collapseThreshold
     ) {
       idsToShow = childIds.slice(0, collapseThreshold);
       meta = {
         autoCollapsed: true,
-        total_replies: childIds.length,
-        hidden_count: childIds.length - collapseThreshold,
+        total_replies: childIds.depth,
+        hidden_count: childIds.depth - collapseThreshold,
       };
     }
     node.replies = idsToShow.map(buildNode);
