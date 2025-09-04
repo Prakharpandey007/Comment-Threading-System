@@ -85,7 +85,7 @@ comment-threading-system/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/comment-threading-system.git
+   git clone https://github.com/Prakharpandey007/Comment-Threading-System.git
    cd comment-threading-system
 2. Install dependencies
    ```bash
